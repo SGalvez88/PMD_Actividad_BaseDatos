@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     do{
                         nombre = micursor.getString(0);
                         password = micursor.getString(1);
+
                         textViewResults.append(" "+nombre+" - "+password+"\n");
                     }while (micursor.moveToNext());
                 }
