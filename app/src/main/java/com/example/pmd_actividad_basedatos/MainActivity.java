@@ -13,6 +13,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Locale;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String NOMBRE_DB="usuarios.db";
@@ -28,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView textViewResults;
     private String nombre;
     private String password;
+    private Cursor micursor;
 
 
     @Override
@@ -53,21 +56,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         switch (view.getId()){
             case R.id.buttonRegister:
+                String nombreEncontrado = null;
+
                 nombre = textoUsuario.getText().toString();
                 password = textoPassword.getText().toString();
 
-                ContentValues nuevoRegistro = new ContentValues();
-                nuevoRegistro.put("nombre",nombre );
-                nuevoRegistro.put("password",password);
-                database.insert("usuario",null,nuevoRegistro);
-                Toast.makeText(getApplicationContext(),"Datos almacenados", Toast.LENGTH_SHORT).show();
+
+                micursor = database.rawQuery("SELECT nombre FROM usuario WHERE nombre = nombre",null);
+
+                if(micursor.moveToFirst()){
+                    nombreEncontrado = micursor.getString(0);
+
+                }
+
+                if(!nombre.equals(nombreEncontrado)){
+                    ContentValues nuevoRegistro = new ContentValues();
+                    nuevoRegistro.put("nombre",nombre );
+                    nuevoRegistro.put("password",password);
+                    database.insert("usuario",null,nuevoRegistro);
+                    Toast.makeText(getApplicationContext(),"Datos almacenados", Toast.LENGTH_SHORT).show();
+
+                }else{
+                    Toast.makeText(getApplicationContext(),"Contacto existente", Toast.LENGTH_SHORT).show();
+                }
+
                 break;
 
             case R.id.buttonShowRegister:
 
                 Toast.makeText(getApplicationContext(),"Consultando datos", Toast.LENGTH_SHORT).show();
 
-                Cursor micursor = database.rawQuery("SELECT * FROM usuario",null);
+                micursor = database.rawQuery("SELECT * FROM usuario",null);
                 textViewResults.setText("");
                 if(micursor.moveToFirst()){
                     do{
